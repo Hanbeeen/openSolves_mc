@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+discord.py
+mcrcon
+psycopg2-binary
+pandas
+prometheus-client
+python-dotenv

@@ -1,0 +1,109 @@
+version: "3.8"
+
+services:
+  # 1. Minecraft Server
+  mc-server:
+    image: itzg/minecraft-server
+    container_name: mc-server
+    ports:
+      - "25565:25565" # Game Port
+      - "25575:25575" # RCON Port (Optional to expose, but good for testing)
+    environment:
+      EULA: "TRUE"
+      TYPE: "PAPER" # Optimized server type
+      VERSION: "1.20.4" # Or latest
+      ENABLE_RCON: "true"
+      RCON_PASSWORD: "password" # CHANGE THIS!
+      RCON_PORT: 25575
+      ONLINE_MODE: "false" # For testing/offline mode if needed
+      MOTD: "Minecraft Server with Monitoring"
+    volumes:
+      - ./mc-data:/data
+    networks:
+      - mc-network
+    restart: unless-stopped
+
+  # 2. Prometheus (Monitoring)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "29090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - mc-network
+    restart: unless-stopped
+
+  # 3. Grafana (Visualization)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin # Initial password
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - mc-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # 4. PostgreSQL (Database)
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mc_stats
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - mc-network
+    restart: unless-stopped
+
+  # 5. Discord Bot Server (FastAPI)
+  bot-server:
+    build: ./bot
+    container_name: bot-server
+    ports:
+      - "8000:8000" # FastAPI Webhook Port
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - RCON_HOST=mc-server
+      - RCON_PORT=25575
+      - RCON_PASSWORD=password
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=mc_stats
+    volumes:
+      - mc-data:/mc-logs:ro # Read-only access to MC logs
+    networks:
+      - mc-network
+    depends_on:
+      - mc-server
+      - postgres
+    restart: unless-stopped
+
+networks:
+  mc-network:
+    driver: bridge
+
+volumes:
+  mc-data:
+  prometheus-data:
+  grafana-data:
+  postgres-data:
