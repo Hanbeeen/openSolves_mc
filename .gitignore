@@ -1,2 +1,28 @@
-*.pdf
+# System
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
 .env
+
+# Docker Volumes (Data)
+mc-data/
+prometheus-data/
+grafana-data/
+postgres-data/
+
+# Logs
+*.log
+logs/
+
+# IDEs
+.vscode/
+.idea/
+
+*.pdf

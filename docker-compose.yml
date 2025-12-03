@@ -5,18 +5,25 @@ services:
   mc-server:
     image: itzg/minecraft-server
     container_name: mc-server
-    ports:
-      - "25565:25565" # Game Port
-      - "25575:25575" # RCON Port (Optional to expose, but good for testing)
     environment:
       EULA: "TRUE"
-      TYPE: "PAPER" # Optimized server type
-      VERSION: "1.20.4" # Or latest
+      TYPE: "PAPER"
+      VERSION: "1.21.1"
       ENABLE_RCON: "true"
-      RCON_PASSWORD: "password" # CHANGE THIS!
+      RCON_PASSWORD: "password"
       RCON_PORT: 25575
-      ONLINE_MODE: "false" # For testing/offline mode if needed
+      ONLINE_MODE: "false"
       MOTD: "Minecraft Server with Monitoring"
+      PLUGINS: |
+        https://github.com/sladkoff/minecraft-prometheus-exporter/releases/download/v2.5.0/minecraft-prometheus-exporter-2.5.0.jar
+        https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
+        https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
+        https://github.com/ViaVersion/ViaVersion/releases/download/5.5.1/ViaVersion-5.5.1.jar
+    ports:
+      - "25565:25565" # Game Port
+      - "25575:25575" # RCON Port
+      - "9225:9225" # Prometheus Exporter Port
+      - "19132:19132/udp" # Bedrock Port (Geyser)
     volumes:
       - ./mc-data:/data
     networks:
