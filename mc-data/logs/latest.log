@@ -74,3 +74,53 @@
 [08:28:05] [User Authenticator #0/INFO]: UUID of player YuzumintT is c66bb882-8410-3e6c-bc61-c16d22a40e58
 [08:28:05] [Server thread/INFO]: YuzumintT joined the game
 [08:28:05] [Server thread/INFO]: YuzumintT[/172.67.70.67:47161] logged in with entity id 262 at ([world]16.190721758377485, 78.0, 79.49911705287299)
+[08:39:51] [RCON Listener #1/INFO]: Thread RCON Client /172.20.0.6 started
+[08:39:51] [RCON Client /172.20.0.6 #2/INFO]: Thread RCON Client /172.20.0.6 shutting down
+[08:39:51] [Server thread/INFO]: [Not Secure] [Rcon] HeLLo!!!
+[08:40:33] [Async Chat Thread - #1/INFO]: [Not Secure] <YuzumintT> asdf
+[08:41:40] [RCON Listener #1/INFO]: Thread RCON Client /172.20.0.6 started
+[08:41:41] [Server thread/INFO]: YuzumintT lost connection: 사유: 오지게 테러함
+[08:41:41] [Server thread/INFO]: YuzumintT left the game
+[08:41:41] [Server thread/INFO]: [Rcon: Kicked YuzumintT: 사유: 오지게 테러함]
+[08:41:41] [RCON Client /172.20.0.6 #3/INFO]: Thread RCON Client /172.20.0.6 shutting down
+[08:42:10] [User Authenticator #1/INFO]: UUID of player YuzumintT is c66bb882-8410-3e6c-bc61-c16d22a40e58
+[08:42:10] [Server thread/INFO]: YuzumintT joined the game
+[08:42:10] [Server thread/INFO]: YuzumintT[/172.67.70.67:18456] logged in with entity id 1553 at ([world]52.176875201440666, 79.0, 56.124856031681176)
+[08:57:36] [Server thread/INFO]: YuzumintT was slain by Zombie
+[09:00:08] [RCON Listener #1/INFO]: Thread RCON Client /0:0:0:0:0:0:0:1 started
+[09:00:08] [Server thread/INFO]: [Rcon: Stopping the server]
+[09:00:08] [RCON Client /0:0:0:0:0:0:0:1 #4/INFO]: Thread RCON Client /0:0:0:0:0:0:0:1 shutting down
+[09:00:08] [Server thread/INFO]: Stopping server
+[09:00:08] [Server thread/INFO]: [Geyser-Spigot] Disabling Geyser-Spigot v2.9.1-SNAPSHOT
+[09:00:08] [Server thread/INFO]: [Geyser-Spigot] Shutting down Geyser.
+[09:00:08] [Server thread/INFO]: [Geyser-Spigot] Geyser shutdown successfully.
+[09:00:08] [Server thread/INFO]: [PrometheusExporter] Disabling PrometheusExporter v2.5.0
+[09:00:08] [Server thread/INFO]: [org.eclipse.jetty.server.Server] Stopped Server@3ae92be8{STOPPING}[11.0.9,sto=0]
+[09:00:08] [Server thread/INFO]: [org.eclipse.jetty.server.AbstractConnector] Stopped ServerConnector@2917cb94{HTTP/1.1, (http/1.1)}{0.0.0.0:9225}
+[09:00:08] [Server thread/INFO]: [ViaVersion] Disabling ViaVersion v5.5.1
+[09:00:08] [Server thread/INFO]: [ViaVersion] ViaVersion has been disabled; uninjected the platform and shut down the scheduler.
+[09:00:08] [Server thread/INFO]: [floodgate] Disabling floodgate v2.2.5-SNAPSHOT (b121-55a85ec)
+[09:00:08] [Server thread/INFO]: Saving players
+[09:00:08] [Server thread/INFO]: YuzumintT lost connection: Server closed
+[09:00:08] [Server thread/INFO]: YuzumintT left the game
+[09:00:08] [Server thread/INFO]: Saving worlds
+[09:00:08] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[09:00:08] [Server thread/INFO]: [ChunkHolderManager] Waiting 60s for chunk system to halt for world 'world'
+[09:00:08] [Server thread/INFO]: [ChunkHolderManager] Halted chunk system for world 'world'
+[09:00:08] [Server thread/INFO]: [ChunkHolderManager] Saving all chunkholders for world 'world'
+[09:00:08] [WebSocketConnectReadThread-114/INFO]: [Geyser-Spigot] The skin uploader has been closed
+[09:00:08] [Server thread/INFO]: [ChunkHolderManager] Saved 1193 block chunks, 295 entity chunks, 0 poi chunks in world 'world' in 0.50s
+[09:00:08] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world_nether]'/minecraft:the_nether
+[09:00:08] [Server thread/INFO]: [ChunkHolderManager] Waiting 60s for chunk system to halt for world 'world_nether'
+[09:00:08] [Server thread/INFO]: [ChunkHolderManager] Halted chunk system for world 'world_nether'
+[09:00:08] [Server thread/INFO]: [ChunkHolderManager] Saving all chunkholders for world 'world_nether'
+[09:00:08] [Server thread/INFO]: [ChunkHolderManager] Saved 0 block chunks, 12 entity chunks, 0 poi chunks in world 'world_nether' in 0.00s
+[09:00:08] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world_the_end]'/minecraft:the_end
+[09:00:08] [Server thread/INFO]: [ChunkHolderManager] Waiting 60s for chunk system to halt for world 'world_the_end'
+[09:00:08] [Server thread/INFO]: [ChunkHolderManager] Halted chunk system for world 'world_the_end'
+[09:00:08] [Server thread/INFO]: [ChunkHolderManager] Saving all chunkholders for world 'world_the_end'
+[09:00:08] [Server thread/INFO]: [ChunkHolderManager] Saved 0 block chunks, 10 entity chunks, 0 poi chunks in world 'world_the_end' in 0.00s
+[09:00:08] [Server thread/INFO]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[09:00:08] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[09:00:08] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[09:00:08] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved
