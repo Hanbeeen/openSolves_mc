@@ -66,11 +66,11 @@ class LogParser:
         if match:
             player = match.group(1)
             
-            # 다이아몬드 개수 업데이트 (여기서 읽고 메인에서 저장)
-            diamonds = self.stats_reader.get_diamond_count(player)
+            # 광물 채굴 통계 업데이트
+            mined_stats = self.stats_reader.get_mined_counts(player)
             
             if self.event_callback:
-                self.event_callback("logout", {"player": player, "diamonds": diamonds})
+                self.event_callback("logout", {"player": player, "mined_stats": mined_stats})
             return
 
         # 3. 발전 과제

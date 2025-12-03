@@ -61,9 +61,10 @@ async def handle_log_event(event_type, data):
         # 사용자가 이전에 "플레이 타임" 기능을 요청했었음.
         # DB 클래스나 여기에 적절한 플레이 타임 업데이트 쿼리를 추가해야 함.
         
-        # 다이아몬드 업데이트
-        if 'diamonds' in data:
-            await db.set_stat(player, "diamonds_mined", data['diamonds'])
+        # 광물 통계 업데이트
+        if 'mined_stats' in data:
+            for stat, value in data['mined_stats'].items():
+                await db.set_stat(player, stat, value)
 
     elif event_type == 'advancement':
         await db.update_stat(data['player'], "advancements")

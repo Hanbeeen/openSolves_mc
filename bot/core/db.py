@@ -47,6 +47,13 @@ class Database:
                 last_logout TIMESTAMP,
                 advancements INT DEFAULT 0,
                 diamonds_mined INT DEFAULT 0,
+                coal_mined INT DEFAULT 0,
+                iron_mined INT DEFAULT 0,
+                gold_mined INT DEFAULT 0,
+                emerald_mined INT DEFAULT 0,
+                lapis_mined INT DEFAULT 0,
+                redstone_mined INT DEFAULT 0,
+                netherite_mined INT DEFAULT 0,
                 last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
             """
