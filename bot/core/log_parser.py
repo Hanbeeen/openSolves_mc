@@ -14,8 +14,8 @@ class LogParser:
         self.patterns = {
             'login': re.compile(r': (\w+) joined the game'),
             'logout': re.compile(r': (\w+) left the game'),
-            'advancement': re.compile(r': (\w+) has made the advancement \[(.+?)\]'),
-            'death': re.compile(r': (.+?) (was slain by|walked into a cactus|burned to death|drowned|fell from a high place|tried to swim in lava|blew up|was shot by|withered away|died|was killed by) ?(.*)'),
+            'advancement': re.compile(r': (\w+) has (?:made the advancement|reached the goal|completed the challenge) \[(.+?)\]'),
+            'death': re.compile(r': (.+?) (was slain by|was pricked to death|walked into a cactus|burned to death|drowned|fell from a high place|tried to swim in lava|blew up|was shot by|withered away|died|was killed by|starved to death|suffocated in a wall|was squashed by a falling anvil|fell out of the world|fell from a high place|experienced kinetic energy|was struck by lightning|discovered the floor was lava|was impaled|froze to death|was stung to death) ?(.*)'),
         }
 
     def follow(self):
@@ -67,7 +67,9 @@ class LogParser:
             player = match.group(1)
             
             # 광물 채굴 통계 업데이트
+            print(f"[DEBUG] Logout detected for {player}. Fetching stats...")
             mined_stats = self.stats_reader.get_mined_counts(player)
+            print(f"[DEBUG] Stats for {player}: {mined_stats}")
             
             if self.event_callback:
                 self.event_callback("logout", {"player": player, "mined_stats": mined_stats})

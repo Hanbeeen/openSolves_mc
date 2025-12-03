@@ -79,19 +79,9 @@ async def handle_log_event(event_type, data):
             await db.update_stat(killer, "kills")
 
     # 2. 디스코드 알림
-    channel = bot.get_channel(1346376467000786964) # 실제 채널 ID나 설정으로 교체 필요
-    # 채널을 찾을 수 없는 경우 (예: 설정되지 않음), 기본 채널을 찾거나 출력
+    channel = bot.get_channel(1445330465530576938)
     if not channel:
-        # 'general' 또는 'minecraft'라는 이름의 채널 찾기 시도
-        for guild in bot.guilds:
-            for ch in guild.text_channels:
-                if ch.name in ['general', 'minecraft', 'chat']:
-                    channel = ch
-                    break
-            if channel: break
-    
-    if not channel:
-        print(f"Warning: No channel found to broadcast {event_type}")
+        print(f"Warning: !!! No channel found to broadcast {event_type}")
         return
 
     if event_type == 'death':
@@ -122,8 +112,8 @@ async def handle_log_event(event_type, data):
 
         # 굴욕적인 죽음 처리 (PvE)
         if not is_pvp:
-            if "cactus" in reason:
-                await channel.send(f"🌵 **{victim}**님이 선인장과 포옹했습니다. 따끔하네요.")
+            if "cactus" in reason or "pricked" in reason:
+                await channel.send(f"🌵 **{victim}**님이 선인장이나 가시에 찔려 사망했습니다. 따끔하네요.")
             elif "berry" in reason:
                 await channel.send(f"🫐 **{victim}**님이 달콤한 베리 덤불에 찔려 죽었습니다. 부끄럽군요.")
             elif "high place" in reason:
@@ -132,6 +122,22 @@ async def handle_log_event(event_type, data):
                 await channel.send(f"💧 **{victim}**님이 숨쉬는 법을 까먹었습니다.")
             elif "lava" in reason:
                 await channel.send(f"🔥 **{victim}**님이 용암 수영을 시도했습니다.")
+            elif "starved" in reason:
+                await channel.send(f"🍖 **{victim}**님이 배고픔을 이기지 못했습니다. 밥 좀 챙겨 드세요.")
+            elif "suffocated" in reason:
+                await channel.send(f"🧱 **{victim}**님이 벽 속에 갇혔습니다.")
+            elif "squashed" in reason or "anvil" in reason:
+                await channel.send(f"🔨 **{victim}**님이 떨어지는 모루에 납작해졌습니다. 머리 조심!")
+            elif "world" in reason or "void" in reason:
+                await channel.send(f"🌌 **{victim}**님이 공허로 떠났습니다. 사요나라.")
+            elif "kinetic" in reason:
+                await channel.send(f"🚀 **{victim}**님이 너무 빨리 날았습니다. (운동 에너지)")
+            elif "lightning" in reason:
+                await channel.send(f"⚡ **{victim}**님이 천벌을 받았습니다.")
+            elif "frozen" in reason:
+                await channel.send(f"🥶 **{victim}**님이 동태가 되었습니다.")
+            elif "stung" in reason:
+                await channel.send(f"🐝 **{victim}**님이 벌집을 건드렸나 봅니다.")
             else:
                 await channel.send(f"☠️ **{victim}**님이 사망했습니다. ({reason})")
 
