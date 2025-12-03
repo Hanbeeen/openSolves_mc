@@ -14,7 +14,7 @@ class Stats(commands.Cog):
             await ctx.send(f"잘못된 통계 유형입니다. 다음 중에서 선택하세요: {', '.join(valid_stats)}")
             return
 
-        data = db.get_top_players(stat_type)
+        data = await db.get_top_players(stat_type)
         
         if not data:
             await ctx.send("아직 데이터가 없습니다.")

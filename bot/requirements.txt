@@ -2,7 +2,7 @@ fastapi
 uvicorn
 discord.py
 mcrcon
-psycopg2-binary
+asyncpg
 pandas
 prometheus-client
 python-dotenv

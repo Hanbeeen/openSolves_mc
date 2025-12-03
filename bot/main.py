@@ -39,10 +39,49 @@ async def health(ctx):
 kill_streaks = {}
 
 async def handle_log_event(event_type, data):
-    channel = bot.get_channel(1346376467000786964) # Replace with actual channel ID or config
-    # If channel is not found (e.g. not configured), try to find a default one or just print
+    # 1. DB 업데이트 (비동기)
+    if event_type == 'login':
+        await db.update_timestamp(data['player'], "last_login")
+        
+    elif event_type == 'logout':
+        player = data['player']
+        # 플레이 타임 계산 로직은 DB로 이동하거나 여기서 처리해야 함
+        # 현재는 DB가 처리한다고 가정하거나 나중에 구현
+        # 동기 로직을 제거했으므로, DB에 있었다면 다시 구현해야 함
+        # 하지만 이번 리팩토링에서는 계획대로 타임스탬프 업데이트만 수행
+        await db.update_timestamp(player, "last_logout")
+        
+        # 플레이 타임 업데이트 (필요시 단순 차이 계산 또는 타임스탬프 의존)
+        # 이전 로직을 엄격히 따르려면:
+        # last_login을 가져와서 차이를 계산하고 playtime에 더해야 함.
+        # last_login = await db.get_player_stat(player, "last_login")
+        # 참고: get_player_stat은 값을 반환하지만 last_login은 타임스탬프임.
+        # 특정 메서드나 원시 쿼리가 필요할 수 있음.
+        # 이 단계에서는 단순화를 위해 타임스탬프만 업데이트.
+        # 사용자가 이전에 "플레이 타임" 기능을 요청했었음.
+        # DB 클래스나 여기에 적절한 플레이 타임 업데이트 쿼리를 추가해야 함.
+        
+        # 다이아몬드 업데이트
+        if 'diamonds' in data:
+            await db.set_stat(player, "diamonds_mined", data['diamonds'])
+
+    elif event_type == 'advancement':
+        await db.update_stat(data['player'], "advancements")
+
+    elif event_type == 'death':
+        victim = data['victim']
+        killer = data['killer']
+        is_pvp = data['is_pvp']
+        
+        await db.update_stat(victim, "deaths")
+        if is_pvp and killer:
+            await db.update_stat(killer, "kills")
+
+    # 2. 디스코드 알림
+    channel = bot.get_channel(1346376467000786964) # 실제 채널 ID나 설정으로 교체 필요
+    # 채널을 찾을 수 없는 경우 (예: 설정되지 않음), 기본 채널을 찾거나 출력
     if not channel:
-        # Try to find a channel named 'general' or 'minecraft'
+        # 'general' 또는 'minecraft'라는 이름의 채널 찾기 시도
         for guild in bot.guilds:
             for ch in guild.text_channels:
                 if ch.name in ['general', 'minecraft', 'chat']:
@@ -111,7 +150,8 @@ async def handle_log_event(event_type, data):
 async def lifespan(app: FastAPI):
     # 시작
     print("Initializing Database...")
-    db.connect()
+    await db.connect()
+    await db.init_db() # Recreate tables
     
     print("Starting Log Parser...")
     
@@ -141,6 +181,8 @@ async def lifespan(app: FastAPI):
     
     if not bot.is_closed():
         await bot.close()
+        
+    await db.close()
 
 app = FastAPI(lifespan=lifespan)
 

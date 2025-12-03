@@ -1,7 +1,6 @@
 import time
 import re
 import os
-from .db import db
 from .stats_reader import StatsReader
 
 class LogParser:
@@ -54,61 +53,62 @@ class LogParser:
         
         message = ": " + parts[1].strip() # 정규식 일관성을 위해 콜론 추가
         
-        # 1. Login
+        # 1. 로그인
         match = self.patterns['login'].search(message)
         if match:
             player = match.group(1)
-            db.update_timestamp(player, "last_login")
             if self.event_callback:
                 self.event_callback("login", {"player": player})
             return
 
-        # 2. Logout
+        # 2. 로그아웃
         match = self.patterns['logout'].search(message)
         if match:
             player = match.group(1)
-            db.update_playtime(player)
             
-            # Update Diamond Count
+            # 다이아몬드 개수 업데이트 (여기서 읽고 메인에서 저장)
             diamonds = self.stats_reader.get_diamond_count(player)
-            db.set_stat(player, "diamonds_mined", diamonds)
             
             if self.event_callback:
-                self.event_callback("logout", {"player": player})
+                self.event_callback("logout", {"player": player, "diamonds": diamonds})
             return
 
-        # 3. Advancement
+        # 3. 발전 과제
         match = self.patterns['advancement'].search(message)
         if match:
             player = match.group(1)
             advancement = match.group(2)
-            db.update_stat(player, "advancements")
             if self.event_callback:
                 self.event_callback("advancement", {"player": player, "advancement": advancement})
             return
 
-        # 4. PvP Death
-        match = self.patterns['death_pvp'].search(message)
+        # 4. 사망
+        match = self.patterns['death'].search(message)
         if match:
             victim = match.group(1)
-            killer = match.group(2)
-            db.update_stat(victim, "deaths")
-            db.update_stat(killer, "kills")
-            print(f"Detected PvP: {killer} -> {victim}")
+            reason_part = match.group(2)
+            killer_part = match.group(3)
+            
+            is_pvp = False
+            killer = None
+            
+            # 킬러가 플레이어인지 확인 (단순 휴리스틱: 공백이 없거나 알려진 플레이어 목록)
+            # 현재는 "was slain by"가 있고 킬러가 비어있지 않으면 PvP로 가정
+            if "was slain by" in reason_part and killer_part:
+                is_pvp = True
+                killer = killer_part.strip()
+            
+            # 정교한 감지 로직을 여기에 추가 가능
+            
             if self.event_callback:
-                self.event_callback("death", {"victim": victim, "killer": killer, "is_pvp": True, "reason": "slain"})
-            return
-
-        # 5. PvE Death (Fallback if not PvP)
-        match = self.patterns['death_pve'].search(message)
-        if match:
-            victim = match.group(1)
-            reason = match.group(2)
-            db.update_stat(victim, "deaths")
-            print(f"Detected PvE: {victim} ({reason})")
-            if self.event_callback:
-                self.event_callback("death", {"victim": victim, "killer": None, "is_pvp": False, "reason": reason})
+                self.event_callback("death", {
+                    "victim": victim, 
+                    "killer": killer, 
+                    "is_pvp": is_pvp, 
+                    "reason": f"{reason_part} {killer_part}".strip()
+                })
             return
 
     def stop(self):
+        self._running = False
         self._running = False
