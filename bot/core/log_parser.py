@@ -19,17 +19,40 @@ class LogParser:
         }
 
     def follow(self):
-        """로그 파일에서 새로운 라인을 생성하는 제너레이터입니다."""
+        """로그 파일에서 새로운 라인을 생성하는 제너레이터입니다. 파일 로테이션을 처리합니다."""
         self.log_file.seek(0, os.SEEK_END)
-        while True:
+        
+        # 현재 파일의 inode 저장
+        try:
+            current_inode = os.fstat(self.log_file.fileno()).st_ino
+        except Exception as e:
+            print(f"[ERROR] Failed to get inode: {e}")
+            return
+
+        while self._running:
             line = self.log_file.readline()
             if not line:
+                # EOF 도달 시 파일 로테이션 확인
+                try:
+                    if os.path.exists(self.log_path):
+                        new_inode = os.stat(self.log_path).st_ino
+                        if new_inode != current_inode:
+                            print(f"[INFO] Log rotation detected. Reopening {self.log_path}...")
+                            self.log_file.close()
+                            self.log_file = open(self.log_path, "r", encoding="utf-8", errors='ignore')
+                            current_inode = new_inode
+                            # 새 파일의 처음부터 읽기 시작
+                            continue
+                except Exception as e:
+                    print(f"[ERROR] Error checking for log rotation: {e}")
+                
                 time.sleep(0.1)
                 continue
             yield line
 
     def start(self):
         print(f"Starting Log Parser on {self.log_path}...")
+        self._running = True
         
         # Wait for file to exist
         while not os.path.exists(self.log_path):
@@ -40,6 +63,7 @@ class LogParser:
             with open(self.log_path, "r", encoding="utf-8", errors='ignore') as f:
                 self.log_file = f # Assign the opened file object
                 for line in self.follow():
+                    if not self._running: break
                     self.process_line(line)
         except Exception as e:
             print(f"Log Parser Error: {e}")
