@@ -87,6 +87,7 @@ services:
     ports:
       - "8000:8000" # FastAPI Webhook Port
     environment:
+      - PYTHONUNBUFFERED=1
       - DISCORD_TOKEN=${DISCORD_TOKEN}
       - RCON_HOST=mc-server
       - RCON_PORT=25575
@@ -97,7 +98,7 @@ services:
       - DB_PASSWORD=password
       - DB_NAME=mc_stats
     volumes:
-      - mc-data:/mc-logs:ro # Read-only access to MC logs
+      - ./mc-data:/mc-logs:ro # Read-only access to MC logs
     networks:
       - mc-network
     depends_on:
@@ -110,7 +111,6 @@ networks:
     driver: bridge
 
 volumes:
-  mc-data:
   prometheus-data:
   grafana-data:
   postgres-data:

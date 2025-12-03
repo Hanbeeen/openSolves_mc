@@ -8,19 +8,19 @@ class Stats(commands.Cog):
 
     @commands.command(name="leaderboard", aliases=["lb", "랭킹"])
     async def leaderboard(self, ctx, stat_type: str = "deaths"):
-        """Shows the leaderboard. Usage: !lb [deaths|kills|blocks_broken]"""
+        """랭킹을 보여줍니다. 사용법: !lb [deaths|kills|blocks_broken]"""
         valid_stats = ["deaths", "kills", "blocks_broken"]
         if stat_type not in valid_stats:
-            await ctx.send(f"Invalid stat type. Choose from: {', '.join(valid_stats)}")
+            await ctx.send(f"잘못된 통계 유형입니다. 다음 중에서 선택하세요: {', '.join(valid_stats)}")
             return
 
         data = db.get_top_players(stat_type)
         
         if not data:
-            await ctx.send("No data available yet.")
+            await ctx.send("아직 데이터가 없습니다.")
             return
 
-        embed = discord.Embed(title=f"🏆 Leaderboard: {stat_type.capitalize()}", color=discord.Color.gold())
+        embed = discord.Embed(title=f"🏆 랭킹: {stat_type.capitalize()}", color=discord.Color.gold())
         
         description = ""
         for i, row in enumerate(data, 1):
