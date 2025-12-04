@@ -5,6 +5,7 @@ services:
   mc-server:
     image: itzg/minecraft-server
     container_name: mc-server
+    platform: linux/amd64
     environment:
       EULA: "TRUE"
       TYPE: "PAPER"
@@ -22,7 +23,7 @@ services:
     ports:
       - "25565:25565" # Game Port
       - "25575:25575" # RCON Port
-      - "9225:9225" # Prometheus Exporter Port
+      - "9940:9940" # Prometheus Exporter Port
       - "19132:19132/udp" # Bedrock Port (Geyser)
     volumes:
       - ./mc-data:/data
@@ -32,6 +33,7 @@ services:
 
   # 2. Prometheus (Monitoring)
   prometheus:
+    platform: linux/amd64
     image: prom/prometheus:latest
     container_name: prometheus
     ports:
@@ -50,22 +52,38 @@ services:
 
   # 3. Grafana (Visualization)
   grafana:
+    platform: linux/amd64
     image: grafana/grafana:latest
     container_name: grafana
     ports:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin # Initial password
+      - GF_RENDERING_SERVER_URL=http://renderer:8081/render #이미지 렌더링을 위한 URL
+      - GF_RENDERING_CALLBACK_URL=http://grafana:3000/ #이미지 렌더링 후 콜백 URL
+      - GF_LOG_FILTERS=rendering:debug
     volumes:
       - grafana-data:/var/lib/grafana
     networks:
       - mc-network
     depends_on:
       - prometheus
+      - renderer
+    restart: unless-stopped
+
+  # 3.5 Grafana Image Renderer #이미지 렌더링을 위한 서비스
+  renderer:
+    image: grafana/grafana-image-renderer:latest
+    container_name: grafana-renderer
+    ports:
+      - "8081"
+    networks:
+      - mc-network
     restart: unless-stopped
 
   # 4. PostgreSQL (Database)
   postgres:
+    platform: linux/amd64
     image: postgres:15-alpine
     container_name: postgres
     ports:
@@ -82,6 +100,7 @@ services:
 
   # 5. Discord Bot Server (FastAPI)
   bot-server:
+    platform: linux/amd64
     build: ./bot
     container_name: bot-server
     ports:
@@ -96,8 +115,11 @@ services:
       - DB_USER=user
       - DB_PASSWORD=password
       - DB_NAME=mc_stats
+      - GRAFANA_URL=http://grafana:3000
+      - GRAFANA_TOKEN=${GRAFANA_TOKEN} # Needs to be set in .env
+      - PYTHONUNBUFFERED=1
     volumes:
-      - mc-data:/mc-logs:ro # Read-only access to MC logs
+      - ./mc-data:/mc-logs:ro # Read-only access to MC logs
     networks:
       - mc-network
     depends_on:

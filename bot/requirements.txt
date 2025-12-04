@@ -6,3 +6,4 @@ psycopg2-binary
 pandas
 prometheus-client
 python-dotenv
+aiohttp  #비동기 HTTP 요청을 위해 aiohttp를 requirements.txt에 추가

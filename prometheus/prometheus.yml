@@ -4,4 +4,4 @@ global:
 scrape_configs:
   - job_name: 'minecraft'
     static_configs:
-      - targets: ['mc-server:9225'] # minecraft-exporter default port
+      - targets: ['mc-server:9940'] # minecraft-exporter default port
