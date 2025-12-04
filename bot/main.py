@@ -23,7 +23,8 @@ async def on_ready():
     # Load extensions
     await bot.load_extension("cogs.admin")
     await bot.load_extension("cogs.stats")
-    print("Loaded cogs: admin, stats")
+    await bot.load_extension("cogs.grafana")
+    print("Loaded cogs: admin, stats, grafana")
 
 @bot.command()
 async def ping(ctx):

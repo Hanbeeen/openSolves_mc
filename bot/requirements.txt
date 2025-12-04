@@ -6,3 +6,4 @@ asyncpg
 pandas
 prometheus-client
 python-dotenv
+aiohttp
