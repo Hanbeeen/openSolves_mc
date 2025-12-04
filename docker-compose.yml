@@ -14,6 +14,7 @@ services:
       RCON_PORT: 25575
       ONLINE_MODE: "false"
       MOTD: "Minecraft Server with Monitoring"
+      MEMORY: "6G" # Optimized for M4 Pro (24GB RAM)
       PLUGINS: |
         https://github.com/sladkoff/minecraft-prometheus-exporter/releases/download/v2.5.0/minecraft-prometheus-exporter-2.5.0.jar
         https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot

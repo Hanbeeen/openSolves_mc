@@ -116,7 +116,7 @@ async def handle_log_event(event_type, data):
                 await channel.send(f"🌵 **{victim}**님이 선인장이나 가시에 찔려 사망했습니다. 따끔하네요.")
             elif "berry" in reason:
                 await channel.send(f"🫐 **{victim}**님이 달콤한 베리 덤불에 찔려 죽었습니다. 부끄럽군요.")
-            elif "high place" in reason:
+            elif "high place" in reason or "hit the ground" in reason:
                 await channel.send(f"📉 **{victim}**님이 날 수 있다고 믿었습니다.")
             elif "drowned" in reason:
                 await channel.send(f"💧 **{victim}**님이 숨쉬는 법을 까먹었습니다.")

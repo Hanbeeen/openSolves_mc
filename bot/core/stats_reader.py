@@ -25,15 +25,19 @@ class StatsReader:
     def get_mined_counts(self, player_name):
         """플레이어의 광물 채굴 통계를 반환합니다."""
         if player_name not in self.uuid_map:
+            print(f"[DEBUG] {player_name} not in cache. Reloading...")
             self.load_usercache()
         
         if player_name not in self.uuid_map:
+            print(f"[DEBUG] {player_name} not found in usercache.")
             return {}
 
         uuid = self.uuid_map[player_name]
         stats_file = os.path.join(self.stats_dir, f"{uuid}.json")
+        print(f"[DEBUG] Reading stats from {stats_file}")
 
         if not os.path.exists(stats_file):
+            print(f"[DEBUG] Stats file not found: {stats_file}")
             return {}
 
         try:

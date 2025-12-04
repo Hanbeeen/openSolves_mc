@@ -3,19 +3,19 @@ import re
 import os
 from .stats_reader import StatsReader
 
-class LogParser:
     def __init__(self, log_path="/mc-logs/logs/latest.log", event_callback=None):
         self.log_path = log_path
         self._running = False
         self.event_callback = event_callback
         self.stats_reader = StatsReader()
+        self.known_players = set()
         
         # Regex Patterns
         self.patterns = {
             'login': re.compile(r': (\w+) joined the game'),
             'logout': re.compile(r': (\w+) left the game'),
             'advancement': re.compile(r': (\w+) has (?:made the advancement|reached the goal|completed the challenge) \[(.+?)\]'),
-            'death': re.compile(r': (.+?) (was slain by|was pricked to death|walked into a cactus|burned to death|drowned|fell from a high place|tried to swim in lava|blew up|was shot by|withered away|died|was killed by|starved to death|suffocated in a wall|was squashed by a falling anvil|fell out of the world|fell from a high place|experienced kinetic energy|was struck by lightning|discovered the floor was lava|was impaled|froze to death|was stung to death) ?(.*)'),
+            'death': re.compile(r': (.+?) (was slain by|was pricked to death|walked into a cactus|burned to death|drowned|fell from a high place|tried to swim in lava|blew up|was shot by|withered away|died|was killed by|starved to death|suffocated in a wall|was squashed by a falling anvil|fell out of the world|fell from a high place|experienced kinetic energy|was struck by lightning|discovered the floor was lava|was impaled|froze to death|was stung to death|hit the ground too hard) ?(.*)'),
         }
 
     def follow(self):
@@ -54,6 +54,11 @@ class LogParser:
         print(f"Starting Log Parser on {self.log_path}...")
         self._running = True
         
+        # Load initial players from usercache
+        self.stats_reader.load_usercache()
+        self.known_players.update(self.stats_reader.uuid_map.keys())
+        print(f"[INFO] Loaded {len(self.known_players)} players from usercache.")
+        
         # Wait for file to exist
         while not os.path.exists(self.log_path):
             print(f"Waiting for log file: {self.log_path}")
@@ -81,6 +86,7 @@ class LogParser:
         match = self.patterns['login'].search(message)
         if match:
             player = match.group(1)
+            self.known_players.add(player)
             if self.event_callback:
                 self.event_callback("login", {"player": player})
             return
@@ -118,13 +124,15 @@ class LogParser:
             is_pvp = False
             killer = None
             
-            # 킬러가 플레이어인지 확인 (단순 휴리스틱: 공백이 없거나 알려진 플레이어 목록)
-            # 현재는 "was slain by"가 있고 킬러가 비어있지 않으면 PvP로 가정
+            # 킬러가 플레이어인지 확인 (known_players 목록 대조)
             if "was slain by" in reason_part and killer_part:
-                is_pvp = True
-                killer = killer_part.strip()
-            
-            # 정교한 감지 로직을 여기에 추가 가능
+                clean_killer_part = killer_part.strip()
+                for player in self.known_players:
+                    # "Alex" 또는 "Alex using [Sword]" 형태 확인
+                    if clean_killer_part == player or clean_killer_part.startswith(f"{player} "):
+                        is_pvp = True
+                        killer = player
+                        break
             
             if self.event_callback:
                 self.event_callback("death", {
