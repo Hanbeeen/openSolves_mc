@@ -33,11 +33,11 @@ class Database:
         if not self.pool:
             await self.connect()
 
-        # 기존 테이블 삭제 및 재생성
+        # 기존 테이블 삭제 및 재생성 방지
+        # queries = ["DROP TABLE IF EXISTS player_stats;"] 
         queries = [
-            "DROP TABLE IF EXISTS player_stats;",
             """
-            CREATE TABLE player_stats (
+            CREATE TABLE IF NOT EXISTS player_stats (
                 player_name VARCHAR(50) PRIMARY KEY,
                 kills INT DEFAULT 0,
                 deaths INT DEFAULT 0,
