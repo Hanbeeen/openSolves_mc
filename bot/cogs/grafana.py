@@ -14,6 +14,32 @@ class Grafana(commands.Cog):
         self.dashboard_uid = "minecraft-server" 
         self.charts = {} # Name -> ID mapping
 
+    async def cog_check(self, ctx):
+        # DM Check
+        if not ctx.guild:
+            await ctx.send("⛔ **DM에서는 사용할 수 없습니다.**")
+            return False
+
+        user_roles = [role.name.lower().strip() for role in ctx.author.roles]
+        
+        print(f"[DEBUG][GrafanaCog] Check for {ctx.author} (ID: {ctx.author.id})")
+        print(f"[DEBUG][GrafanaCog] Roles: {user_roles}")
+
+        # 1. 관리자 권한(Administrator) 확인 -> [Strict Mode] 비활성화
+        # if ctx.author.guild_permissions.administrator:
+        #     return True
+            
+        # 2. 특정 역할(Role) 확인 (대소문자 구분 없음)
+        allowed_roles = ["admin", "minecraft admin", "operator", "op", "관리자", "운영자"]
+        
+        if any(role in allowed_roles for role in user_roles):
+            print("[DEBUG][GrafanaCog] Access Granted (Role Match)")
+            return True
+
+        print("[DEBUG][GrafanaCog] Access Denied")
+        await ctx.send("⛔ **권한이 없습니다.** 'Admin' 또는 '관리자' 역할이 필요합니다.")
+        return False
+
     async def sync_dashboard_panels(self):
         """
         Fetches the dashboard definition from Grafana and updates the chart mapping.
@@ -69,6 +95,7 @@ class Grafana(commands.Cog):
         Manually triggers a sync with Grafana Dashboard.
         Use this if you added new panels to Grafana.
         """
+        print(f"[DEBUG] Executing SYNC command for {ctx.author}")
         success = await self.sync_dashboard_panels()
         if success:
             available = ", ".join(self.charts.keys())
@@ -81,6 +108,7 @@ class Grafana(commands.Cog):
         """
         Sets the Grafana Dashboard UID and re-syncs.
         """
+        print(f"[DEBUG] Executing SET_DASHBOARD command for {ctx.author}")
         self.dashboard_uid = uid
         await self.sync_dashboard_panels()
         await ctx.send(f"✅ Dashboard UID set to `{uid}` and synced.")
@@ -91,6 +119,7 @@ class Grafana(commands.Cog):
         Fetches a chart from Grafana.
         Usage: !chart <name> (e.g., !chart players)
         """
+        print(f"[DEBUG] Executing CHART command for {ctx.author}")
         if not self.grafana_token:
             await ctx.send("⚠️ **Configuration Error**: `GRAFANA_TOKEN` is not set.")
             return

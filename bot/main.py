@@ -12,6 +12,7 @@ from core.log_parser import LogParser
 # 디스코드 봇 설정
 intents = discord.Intents.default()
 intents.message_content = True
+# intents.members = True # 개발자 포털에서 승인 필요 (User requested fix for crash)
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # 로그 파서 인스턴스
@@ -20,19 +21,60 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user} (ID: {bot.user.id})')
-    # Load extensions
-    await bot.load_extension("cogs.admin")
-    await bot.load_extension("cogs.stats")
-    await bot.load_extension("cogs.grafana")
-    print("Loaded cogs: admin, stats, grafana")
+    # Extensions are now loaded in lifespan startup to avoid reloading on reconnects
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        return
+    if isinstance(error, commands.CheckFailure):
+        # check_admin or cog_check failed
+        # Usually checking handles messaging, but this catches bubbles
+        return
+    
+    print(f"[ERROR] Command Error: {error}")
+    # await ctx.send(f"❌ **오류 발생**: `{error}`") # 유저에게 에러 보여주기 (옵션)
+
+# 관리자 권한 확인 함수
+async def check_admin(ctx):
+    # DM Check
+    if not ctx.guild:
+        await ctx.send("⛔ **DM에서는 사용할 수 없습니다.**")
+        return False
+
+    user_roles = [role.name.lower().strip() for role in ctx.author.roles]
+    is_admin = ctx.author.guild_permissions.administrator
+    
+    print(f"[DEBUG] Check Admin for {ctx.author} (ID: {ctx.author.id})")
+    print(f"[DEBUG] Admin Perm: {is_admin}, Roles: {user_roles}")
+
+    # [Strict Mode] 관리자 권한(Administrator)이 있어도 이름이 일치하는 역할이 없으면 차단
+    # 만약 서버 주인도 차단된다면 이 주석을 해제하세요.
+    # if is_admin:
+    #     print("[DEBUG] Access Granted (Administrator)")
+    #     return True
+    
+    allowed_roles = ["admin", "minecraft admin", "operator", "op", "관리자", "운영자"]
+    
+    if any(role in allowed_roles for role in user_roles):
+        print("[DEBUG] Access Granted (Role Match)")
+        return True
+
+    print("[DEBUG] Access Denied")
+    await ctx.send("⛔ **권한이 없습니다.** 'Admin' 또는 '관리자' 역할이 필요합니다.")
+    return False
 
 @bot.command()
+@commands.check(check_admin)
 async def ping(ctx):
+    print(f"[DEBUG] Executing PING command for {ctx.author}")
     await ctx.send('Pong!')
 
 @bot.command()
+@commands.check(check_admin)
 async def health(ctx):
     """봇의 상태를 확인합니다."""
+    print(f"[DEBUG] Executing HEALTH command for {ctx.author}")
     latency = round(bot.latency * 1000, 2)
     await ctx.send(f"✅ **System Healthy**\nLatency: `{latency}ms`")
 
@@ -47,20 +89,7 @@ async def handle_log_event(event_type, data):
     elif event_type == 'logout':
         player = data['player']
         # 플레이 타임 계산 로직은 DB로 이동하거나 여기서 처리해야 함
-        # 현재는 DB가 처리한다고 가정하거나 나중에 구현
-        # 동기 로직을 제거했으므로, DB에 있었다면 다시 구현해야 함
-        # 하지만 이번 리팩토링에서는 계획대로 타임스탬프 업데이트만 수행
         await db.update_timestamp(player, "last_logout")
-        
-        # 플레이 타임 업데이트 (필요시 단순 차이 계산 또는 타임스탬프 의존)
-        # 이전 로직을 엄격히 따르려면:
-        # last_login을 가져와서 차이를 계산하고 playtime에 더해야 함.
-        # last_login = await db.get_player_stat(player, "last_login")
-        # 참고: get_player_stat은 값을 반환하지만 last_login은 타임스탬프임.
-        # 특정 메서드나 원시 쿼리가 필요할 수 있음.
-        # 이 단계에서는 단순화를 위해 타임스탬프만 업데이트.
-        # 사용자가 이전에 "플레이 타임" 기능을 요청했었음.
-        # DB 클래스나 여기에 적절한 플레이 타임 업데이트 쿼리를 추가해야 함.
         
         # 광물 통계 업데이트
         if 'mined_stats' in data:
@@ -160,6 +189,15 @@ async def lifespan(app: FastAPI):
     print("Initializing Database...")
     await db.connect()
     await db.init_db() # Recreate tables
+    
+    # Load all extensions here
+    extensions = ["cogs.admin", "cogs.stats", "cogs.grafana"]
+    for ext in extensions:
+        try:
+            await bot.load_extension(ext)
+            print(f"Loaded extension: {ext}")
+        except Exception as e:
+            print(f"Failed to load extension {ext}: {e}")
     
     print("Starting Log Parser...")
     
