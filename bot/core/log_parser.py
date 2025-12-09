@@ -3,6 +3,7 @@ import re
 import os
 from .stats_reader import StatsReader
 
+class LogParser:
     def __init__(self, log_path="/mc-logs/logs/latest.log", event_callback=None):
         self.log_path = log_path
         self._running = False
