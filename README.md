@@ -18,6 +18,7 @@
     *   **Log Parser**: 실시간 로그 분석 (PvP/PvE 구분, 사망 원인, 접속 로그).
     *   **Stats Reader**: 마인크래프트 통계 파일(JSON) 파싱.
     *   **Grafana Integration**: 차트 이미지 조회 (`!chart`).
+    *   **Permission System**: 역할(`Admin`, `Operator`) 기반의 엄격한 권한 관리.
 
 ## 🚀 설치 및 실행 방법
 
@@ -29,6 +30,7 @@
 ```env
 DISCORD_TOKEN=your_discord_bot_token_here
 GRAFANA_TOKEN=your_grafana_service_account_token_here
+GRAFANA_URL=http://grafana:3000
 ```
 
 ### 3. 실행
@@ -46,29 +48,40 @@ docker-compose up -d --build
 
 ## 🎮 사용법 (Discord 명령어)
 
-### 📊 통계 및 차트
+> **🔒 보안 안내**: `!leaderboard`를 제외한 **모든 명령어**는 **관리자 역할**이 필요합니다.
+> 디스코드 서버에서 **`Admin`**, **`Operator`**, **`관리자`**, **`운영자`** 중 하나의 이름을 가진 역할을 보유해야 사용 가능합니다. (권한 우회 방지 적용됨)
+
+### 📊 통계 (누구나 사용 가능)
 *   `!leaderboard [항목]`: 랭킹을 확인합니다. (별칭: `!lb`, `!랭킹`)
     *   **사용 예시**: `!lb deaths`, `!lb kills`, `!lb diamonds`
     *   **지원 항목**: `deaths`, `kills`, `diamonds`, `iron`, `gold`, `coal`, `emerald`, `lapis`, `redstone`, `netherite`, `blocks_broken`
-*   `!chart [이름]`: 그라파나 차트를 이미지로 불러옵니다. (예: `!chart tps`, `!chart memory`)
-*   `!sync`: 그라파나 대시보드 패널 목록을 동기화합니다.
 
-### 🛠 관리자 명령어
-*   `!say [메시지]`: 서버 전체에 공지 메시지를 보냅니다.
-*   `!kick [플레이어] [사유]`: 플레이어를 추방합니다.
-*   `!whitelist add [플레이어]`: 화이트리스트에 추가합니다.
+### 📈 모니터링 및 차트 (관리자 전용)
+*   `!chart [이름]`: 그라파나 대시보드의 차트를 이미지로 불러옵니다.
+    *   **사용 예시**: `!chart memory`, `!chart tps`, `!chart players`
+*   `!sync`: 그라파나 대시보드 패널 목록을 봇과 동기화합니다. (새 차트 추가 시 사용)
+*   `!set_dashboard [UID]`: 연동할 그라파나 대시보드 UID를 변경합니다.
 
-### ℹ️ 일반 명령어
-*   `!ping`: 봇 상태 확인 (Pong!).
-*   `!health`: 봇 헬스체크 및 지연 시간 확인.
+### 🛠 서버 관리 (관리자 전용)
+*   `!say [메시지]`: 마인크래프트 서버 전체에 공지 메시지를 방송합니다.
+*   `!kick [플레이어] [사유]`: 플레이어를 서버에서 추방합니다.
+*   `!whitelist [action] [player]`: 화이트리스트를 관리합니다. (`add`, `remove`, `list`)
+    *   예: `!whitelist add Steve`
+
+### ℹ️ 시스템 상태 (관리자 전용)
+*   `!ping`: 봇 응답 속도 확인.
+*   `!health`: 봇 시스템 상태 및 연결 확인.
 
 ## 📂 디렉토리 구조
 ```
 .
 ├── bot/                # 봇 서버 소스코드
-│   ├── cogs/           # 디스코드 명령어 (Admin, Stats, Grafana)
-│   ├── core/           # 핵심 로직 (DB, RCON, Config, LogParser, StatsReader)
-│   ├── main.py         # FastAPI 및 봇 진입점
+│   ├── cogs/           # 디스코드 명령어 모듈
+│   │   ├── admin.py    # 관리자 기능 (!say, !kick, !whitelist)
+│   │   ├── grafana.py  # 차트 시각화 (!chart, !sync)
+│   │   └── stats.py    # 통계 랭킹 (!leaderboard)
+│   ├── core/           # 핵심 로직 (DB, RCON, Config, LogParser)
+│   ├── main.py         # FastAPI 및 봇 진입점 (Cog 로딩 및 권한 관리)
 │   └── Dockerfile      # 봇 서버 도커 이미지 정의
 ├── prometheus/         # 모니터링 설정
 ├── docker-compose.yml  # 전체 시스템 구성
@@ -76,6 +89,7 @@ docker-compose up -d --build
 ```
 
 ## ⚡ 주요 기능 및 특징
+*   **엄격한 권한 관리**: 단순 '관리자 권한' 보유 여부가 아닌, **실제 지정된 역할(Role)**을 보유했는지를 검사하여 보안을 강화했습니다.
 *   **고성능 최적화**: M4 Pro 등 고사양 하드웨어에 맞춰 메모리(6GB) 및 알림 임계값 최적화.
 *   **모바일 지원**: GeyserMC를 통해 별도 계정 연동 없이 모바일 접속 가능 (`auth-type: floodgate`).
 *   **스마트 로그 파싱**:
