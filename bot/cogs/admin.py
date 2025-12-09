@@ -59,5 +59,19 @@ class Admin(commands.Cog):
         
         await ctx.send(f"서버 응답: `{response}`")
 
+    @commands.command(name="ban")
+    async def ban(self, ctx, player: str, *, reason: str = "관리자에 의해 차단됨"):
+        """플레이어를 영구 차단합니다."""
+        print(f"[DEBUG] Executing BAN command for {ctx.author}")
+        response = rcon.send_command(f"ban {player} {reason}")
+        await ctx.send(f"🔨 **{player}**님을 차단했습니다.\n서버 응답: `{response}`")
+
+    @commands.command(name="unban")
+    async def unban(self, ctx, player: str):
+        """플레이어 차단을 해제합니다."""
+        print(f"[DEBUG] Executing UNBAN command for {ctx.author}")
+        response = rcon.send_command(f"pardon {player}")
+        await ctx.send(f"🔓 **{player}**님의 차단을 해제했습니다.\n서버 응답: `{response}`")
+
 async def setup(bot):
     await bot.add_cog(Admin(bot))
