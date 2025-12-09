@@ -48,6 +48,13 @@ class StatsReader:
                 
                 def get_count(items):
                     return sum(mined.get(item, 0) for item in items)
+                
+                # Calculate total blocks broken
+                total_blocks_broken = sum(mined.values())
+                
+                # Extract playtime (ticks)
+                custom_stats = stats.get('minecraft:custom', {})
+                play_time_ticks = custom_stats.get('minecraft:play_time', 0)
 
                 return {
                     "diamonds_mined": get_count(['minecraft:diamond_ore', 'minecraft:deepslate_diamond_ore']),
@@ -57,7 +64,9 @@ class StatsReader:
                     "emerald_mined": get_count(['minecraft:emerald_ore', 'minecraft:deepslate_emerald_ore']),
                     "lapis_mined": get_count(['minecraft:lapis_ore', 'minecraft:deepslate_lapis_ore']),
                     "redstone_mined": get_count(['minecraft:redstone_ore', 'minecraft:deepslate_redstone_ore']),
-                    "netherite_mined": get_count(['minecraft:ancient_debris'])
+                    "netherite_mined": get_count(['minecraft:ancient_debris']),
+                    "blocks_broken": total_blocks_broken,
+                    "playtime": play_time_ticks
                 }
         except Exception as e:
             print(f"[ERROR] {player_name}의 통계 읽기 실패: {e}")
