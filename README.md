@@ -13,12 +13,11 @@
 4.  **Grafana Image Renderer**: 대시보드 차트를 이미지로 변환하여 디스코드로 전송.
 5.  **PostgreSQL**: 플레이어 통계(킬, 데스, 광물 채굴량 등) 영구 저장.
 6.  **Bot Server (FastAPI + Discord.py)**:
-    *   **Alert Webhook**: Prometheus 알림 수신 및 디스코드 전송.
     *   **RCON Client**: 서버 제어 (Kick, Ban, Whitelist).
     *   **Log Parser**: 실시간 로그 분석 (PvP/PvE 구분, 사망 원인, 접속 로그).
     *   **Stats Reader**: 마인크래프트 통계 파일(JSON) 파싱.
     *   **Grafana Integration**: 차트 이미지 조회 (`!chart`).
-    *   **Permission System**: 역할(`Admin`, `Operator`) 기반의 엄격한 권한 관리.
+    *   **Permission System**: 역할(`Admin`) 기반의 엄격한 권한 관리.
 
 ## 🚀 설치 및 실행 방법
 
@@ -30,7 +29,6 @@
 ```env
 DISCORD_TOKEN=your_discord_bot_token_here
 GRAFANA_TOKEN=your_grafana_service_account_token_here
-GRAFANA_URL=http://grafana:3000
 ```
 
 ### 3. 실행
@@ -53,8 +51,8 @@ docker-compose up -d --build
 
 ### 📊 통계 (누구나 사용 가능)
 *   `!leaderboard [항목]`: 랭킹을 확인합니다. (별칭: `!lb`, `!랭킹`)
-    *   **사용 예시**: `!lb deaths`, `!lb kills`, `!lb diamonds`
-    *   **지원 항목**: `deaths`, `kills`, `diamonds`, `iron`, `gold`, `coal`, `emerald`, `lapis`, `redstone`, `netherite`, `blocks_broken`
+    *   **사용 예시**: `!lb playtime`, `!lb kills`, `!lb diamonds`, `!lb blocks`
+    *   **지원 항목**: `playtime`, `kills`, `deaths`, `blocks`, `diamonds`, `coal`, `iron`, `gold`, `netherite`
 
 ### 📈 모니터링 및 차트 (관리자 전용)
 *   `!chart [이름]`: 그라파나 대시보드의 차트를 이미지로 불러옵니다.

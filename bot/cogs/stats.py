@@ -17,11 +17,9 @@ class Stats(commands.Cog):
             "철": "iron_mined", "iron": "iron_mined",
             "금": "gold_mined", "gold": "gold_mined",
             "네더라이트": "netherite_mined", "netherite": "netherite_mined",
-            
             "킬": "kills", "kills": "kills",
             "데스": "deaths", "deaths": "deaths",
             "블럭": "blocks_broken", "blocks": "blocks_broken", "blocks_broken": "blocks_broken",
-            
             "플레이타임": "playtime", "playtime": "playtime", "접속시간": "playtime"
         }
         
