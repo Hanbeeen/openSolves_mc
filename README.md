@@ -7,6 +7,7 @@
 
 이 프로젝트는 Docker Compose를 사용하여 6개의 컨테이너를 유기적으로 연결합니다.
 
+<img width="3344" height="889" alt="Mermaid Chart - Create complex, visual diagrams with text -2025-12-09-120724" src="https://github.com/user-attachments/assets/c1a993e7-c00e-478a-a693-1f0a24dc59ef" /><br>
 1.  **Minecraft Server**: PaperMC 기반 (Geyser + Floodgate 플러그인 탑재).
 2.  **Prometheus**: 서버 성능 데이터(TPS, RAM, 청크 등) 수집.
 3.  **Grafana**: 수집된 데이터를 시각화하는 대시보드.
